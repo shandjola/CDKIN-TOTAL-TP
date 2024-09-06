@@ -1,0 +1,26 @@
+#QUESTION : Faite en sorte que l'instance privé de votre VPC soit connecté à internet 
+
+Pour ca nous allons utiliser un NAT gateway 
+Nous supposons que nous commencons à travailler à partir du VPC creer precedement 
+#ETAPE 1 : Creation du NAT GATEWAY 
+- Nous allons entrer dans le VPC DASHBOARD, et cliquer sur l'option NAT gateway
+- Nous allons cliquer sur create NAT gateway
+- Nous assignons un nom au NAT gateway dans notre cas my-nat ensuite nous selectionnons le subnet publique 
+- Pour terminer la creation on active l'option Elastic IP 
+
+# ETAPE 2 : Rajouter la route dans le subnet privé
+- Nous cliquons sur l'option route tables dans le VPC DASHBOARD ensuite on selectionne le private-rt que nous avons crée
+- Nous lui aujoutons une nouvelle route de destination 0.0.0.0/0 vers target NAT gateway : ID du nat 
+
+NB : Nous avons autorisé tout type de trafique dans NACL du subnet privé
+# ETAPE 3 : Tester le tout 
+- Nous allons se connecter par SSH à l'instance publique, 
+- Ensuite nous allons grace au logiciel mobaXterm, nous allons uploader la clé privé de l'instance privé 
+- une fois uploader, nous allons lui restreindre les permissions en tappant la commande 
+- sudo chmod 700 cle_privé.pem 
+- Ensuite nous allons faire une requete ssh comme ceci 
+- ssh -i cle_privé.pem ec2-user@ip-privé 
+- une fois connecter à l'instance privé, on peut faire la requete ping google.com pour voir si nous sommes 
+  connecter à Internet et effectivement la requete fonctionnne 
+
+Donc nous avons résolu ce TP avec succès :)

@@ -1,0 +1,45 @@
+  adding: home/ec2-user/junior.txt (stored 0%)
+  adding: home/ec2-user/junior2.txt (stored 0%)
+Completed 418 Bytes/418 Bytes (2.7 KiB/s) with 1 file(s) remaining
+move: ./backup.zip to s3://mycohortebucket/backup.zip             
+Backup done at Tue Jun 25 14:01:02 UTC 2024
+  adding: home/ec2-user/junior.txt (stored 0%)
+  adding: home/ec2-user/junior2.txt (stored 0%)
+Completed 418 Bytes/418 Bytes (3.6 KiB/s) with 1 file(s) remaining
+move: ./backup.zip to s3://mycohortebucket/backup.zip             
+Backup done at Tue Jun 25 14:02:02 UTC 2024
+  adding: home/ec2-user/junior.txt (stored 0%)
+  adding: home/ec2-user/junior2.txt (stored 0%)
+Completed 418 Bytes/418 Bytes (4.1 KiB/s) with 1 file(s) remaining
+move: ./backup.zip to s3://mycohortebucket/backup.zip             
+Backup done at Tue Jun 25 14:03:02 UTC 2024
+  adding: home/ec2-user/junior.txt (stored 0%)
+  adding: home/ec2-user/junior2.txt (stored 0%)
+Completed 418 Bytes/418 Bytes (3.4 KiB/s) with 1 file(s) remaining
+move: ./backup.zip to s3://mycohortebucket/backup.zip             
+Backup done at Tue Jun 25 14:04:02 UTC 2024
+  adding: home/ec2-user/junior.txt (stored 0%)
+  adding: home/ec2-user/junior2.txt (stored 0%)
+Completed 418 Bytes/418 Bytes (4.1 KiB/s) with 1 file(s) remaining
+move: ./backup.zip to s3://mycohortebucket/backup.zip             
+Backup done at Tue Jun 25 14:05:02 UTC 2024
+  adding: home/ec2-user/junior.txt (stored 0%)
+  adding: home/ec2-user/junior2.txt (stored 0%)
+Completed 418 Bytes/418 Bytes (4.3 KiB/s) with 1 file(s) remaining
+move: ./backup.zip to s3://mycohortebucket/backup.zip             
+Backup done at Tue Jun 25 14:06:02 UTC 2024
+  adding: home/ec2-user/junior.txt (stored 0%)
+  adding: home/ec2-user/junior2.txt (stored 0%)
+Completed 418 Bytes/418 Bytes (3.9 KiB/s) with 1 file(s) remaining
+move: ./backup.zip to s3://mycohortebucket/backup.zip             
+Backup done at Tue Jun 25 14:07:02 UTC 2024
+  adding: home/ec2-user/junior.txt (stored 0%)
+  adding: home/ec2-user/junior2.txt (stored 0%)
+Completed 418 Bytes/418 Bytes (3.5 KiB/s) with 1 file(s) remaining
+move: ./backup.zip to s3://mycohortebucket/backup.zip             
+Backup done at Tue Jun 25 14:08:02 UTC 2024
+  adding: home/ec2-user/junior.txt (stored 0%)
+  adding: home/ec2-user/junior2.txt (stored 0%)
+Completed 418 Bytes/418 Bytes (4.3 KiB/s) with 1 file(s) remaining
+move: ./backup.zip to s3://mycohortebucket/backup.zip             
+Backup done at Tue Jun 25 14:09:01 UTC 2024

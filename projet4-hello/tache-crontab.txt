@@ -1,0 +1,2 @@
+* * * * * /home/ec2-user/fichier.sh >> /home/ec2-user/journal-cron.log 2>&1
+

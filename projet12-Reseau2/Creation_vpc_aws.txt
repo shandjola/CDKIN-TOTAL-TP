@@ -1,0 +1,88 @@
+# Etablissement de l'environnement de réseau sous aws vpc 
+# l'environnement à mettre en place consiste en 2 sous réseau dans un meme AZ d'une region sauf que 
+# 1 . les hotes du sous reseau publique peuvent aller sur internet sans problème 
+# 2 . Les hotes du sous reseau prive ne peuvent pas aller sur internet 
+# 3 . Chaque sous réseau est isolé de l'autre (Pas de connection)
+
+
+#Etape 1 : Creation du VPC
+- Nous accedons à la console aws en ligne pour se connecter entant que AMI sur l'outil de lab sand box
+- ensuite dans la barre de recherche, nous tapons VPC pour avoir accès au service VPC 
+- En nous allons remarquer un VPC par defaut, alors nous n'allons pas l'utilisé 
+- Nous allons creer un autre VPC, Dans le dashboard vpc nous allons cliquer vur le bouton create VPC 
+- Ensuite nous allons donner un nom qui est mon-vpc-tp et lui assigné l'addresse IP du réseau comme 
+  determiné à l'etape du plan d'addressage, pour finir , nous cliquons sur le bouton create vpc pour le creer 
+- Toujours dans le VPC dashboard, nous allons visualiser la liste des VPC crée 
+
+#Etape 2 : Creation des sous réseau 
+- Nous allons crée des sous reseaux dans un seul AZ 
+- Pour ce faire cliquons sur subnets dans le VPC dashboard et on clique sur le bouton Create VPC 
+- Une fois que nous accedons à l'interface, nous devons d'abord assigné un VPC aux sous réseaux que nous allons 
+  crée 
+- Nous entrons le nom qui identifie notre sous reseau publique, on ecrit mon-public-subnet
+  Nous lui assignons l'addresse ip réseau de 10.20.128.0/24
+  nous lui choisissons un AZ, dans notre cas c'est le us-west-2a
+  et on clique sur le bouton ajouter un subnet 
+- Nous entrons le nom qui identifie notre sous reseau privé, on ecrit mon-privé-subnet
+  Nous lui assignons l'addresse ip réseau de 10.20.129.0/24
+  nous lui choisissons un AZ, dans notre cas c'est le us-west-2a
+  Nous cliquons sur le bouton create subnet 
+- Nous cliquons sur subnets dans le vpc dashboard pour voir la liste des nos subnets 
+
+#Etape 3 : Creation d'une Instance publique dans le sous reseau publique 
+- Nous tapons dans la barre de recherche , le mot EC2
+- Ensuite on clique sur le bouton launch instance 
+- On lui attribut le nom instance-public, on laisse le tout par defaut sauf que on modifie les paramètres reseau
+  dans ces paramètres, on lui assigne le vpc que nous avons crée precedement, on active l'attribution automatique 
+  d'addresse IP car il sera publique et nous en avons besoin et on launch l'instance 
+  NB : On selectionne le subnet : mon-subnet-publique
+       On Cree un nouveau security group et on le donne le nom public-SG et on autorise tout traffic 
+#Etape 4 : Creation d'une instance privée dans le sous réseau privée
+- Nous tapons dans la barre de recherche , le mot EC2
+- Ensuite on clique sur le bouton launch instance 
+- On lui attribut le nom instance-privé, on laisse le tout par defaut sauf que on modifie les paramètres reseau
+  dans ces paramètres, on lui assigne le vpc que nous avons crée precedement, on desactive l'attribution automatique 
+  d'addresse IP car il sera privée et non accesible en ligne 
+  NB : On selectionne le subnet : mon-subnet-privé
+       On Cree un nouveau security group et on le donne le nom prive-SG et on autorise tout traffic
+#ETAPE 5 : Assignation d'un internet gateway au VPC que nous avons crée 
+- Dans le VPC dashboard , on clique sur Internet gateways dans le vollet latéral
+- On detach le IGW par defaut de sand box qui etait attaché au VPC par defaut, en le selectionnant et cliquant sur action
+  dans action on clique sur detach from VPC 
+- Une fois que c'est confirmé, on l'assigne à notre VPC customisé en le selectionnant, et cliquant sur action et attach to VPC
+- Apres on selectionne le VPC crée precedement
+
+Resolution du problème
+----------------------
+1. Avec les tables de routages 
+------------------------------
+- Nous creons une autre table de routage nommé public-route-table, pour ce faire, on fait clique sur route tables dans le VPC dashboard
+- On clique sur le bouton create route table, on insère le nom puis on l'assigne le vpc que nous avons crée 
+- On fait la meme chose pour creer une table de routage nommé private-route-table
+- On assgine la table de routage public-route-table comme principale, en allant dans la liste des tables de routage , on clique sur action
+- On clique sur l'option set main table, ensuite on supprime la table de routage par defaut
+- On va editer les routes 
+- Dans la table de routage publique : on met deux route -> du sous-reseau public : 10.20.128.0/24 vers l'IGW 
+                                                        -> du sous-reseau public : 10.20.128.0/24 vers locale
+- Dans la table de routage privé : on met deux route -> du sous-reseau privé : 10.20.129.0/24 vers locale 
+- On associe le sous réseau privé à la table de routage privé ce qui aura pour effet de le deconnecter de la table de routage public
+  Ainsi l'isolation est fait 
+
+Mais il y a un traffic entre sous reseaux qui s'est fait quand nous concluons que les route tables ne peuvent pas annuler toute connection entre
+VPC, ce qui constitue leurs grands defaut, D'ou la solution serait d'utiliser que ACL pour restreindre les traffics
+2. Avec Les NACL 
+----------------
+- Pour ce faire, on va dans le VPC dashboard, dans l'option network ACL  puis on clique sur create ACL
+- On le nomme mon-acl-isolation, puis on choisi le VPC 
+- On rentre dans la liste des nos ACLs puis on selectionne celui qu'on vient de creer 
+- Par defaut, bloque tout traffic entrant et sortant
+- Pour que ca puisse marcher il suffit de lui assigner, un subnet alors dans l'onglet subnet associations, il faut lui assigné le subnet privé que nous
+  creer 
+TEST : Pour tester la connection à l'instance privée nous allons nous connecter premièrement nous connecter à l'instance publique avec SSH 
+
+- Une fois connecté, nous allons installer l'outil telnet, en faisant yum -y install telnet 
+- Apres nous allons prendre l'IP privé de notre instance privée et faire une une serie des requetes 
+  telnet ip-privé 80
+  telnet ip-privé 22
+  telnet ip-privé 443
+  Toutes ces requetes ont echoué les unes apres les autres, ce qui est un succès                         

@@ -1,0 +1,1 @@
+* * * * * /home/ec2-user/fichier.sh >> /home/ec2-user/journal.log

@@ -1,0 +1,66 @@
+# Exercice : Mettre en place un reseau sur AWS consistuté de 14000 hotes dans 4 AZ
+             Et chaque AZ aura deux subnets : 1 public et 1 privé
+
+# ETAPE 1 : Faire le plan d'addressage du reseau pour 8 sous-reseau
+- pour 14000 hotes, nous avons calculé que 14 bits suffirons car 2^14 = 16384 donc 32 - 14 = 18
+- et 3 bits suffirons pour 8 sous reseau donc 18 + 3 = 21 
+- En choisissant comme addresse IP 10.20.0.0 on aura come resultats
+- Addresse Reseau globale  : 10.20.0.0/18
+- Sous-reseau 1 : 10.20.0.0/21
+- Sous-reseau 2 : 10.20.8.0/21
+- Sous-reseau 3 : 10.20.16.0/21
+- Sous-reseau 4 : 10.20.24.0/21
+- Sous-reseau 5 : 10.20.32.0/21
+- Sous-reseau 6 : 10.20.40.0/21
+- Sous-reseau 7 : 10.20.48.0/21
+- Sous-reseau 8 : 10.20.56.0/21
+
+# ETAPE 2 : Creation d'un VPC 
+- Nous nous connectons à notre compte AWS, et accedons au AWS MANAGEMENT CONSOLE 
+- Dans la barre de recherche des services, nous recherchons le service VPC 
+- Une fois que nous accedons au VPC DASHBOARD, nous cliquons sur your VPCs apres nous cliquons sur create VPC
+- Une fois que nous y sommes, nous lui renseignons une region dans notre on garde la region Oregon(us-west-2)
+- on donne un nom à notre vpc ( my-vpc) puis nous lui assignons une addresse IP CIDR en IPv4 de 10.20.0.0/18
+- puis on clique sur create VPC 
+
+# ETAPE 3 : Creation des subnets
+- Toujours dans le VPC DASHBOARD, on clique sur subnets 
+- une fois cliqué, nous cliquons sur le button create subnets
+- Une fois dans l'interface, on selectionne premièrement le vpc dans lequel cela va rester dans notre cas ce seras 
+  le my-vpc 
+- nous allons nous allons lui assigné un nom puis nous allons renseigner son addresse IP, pour le premier
+  on mettra l'addresse IP du sous-reseau 1 
+- nous allons selectionner un des AZs disponible dans notre region pour le premier ce sera le us-west-2a
+- nous allons repeter le meme processus en cliquant sur add subnets 
+- ainsi on va renseigner les choses de cette manière pour chaque Subnets 
+  -> nom : my-public-subnet-1 ; AZ : us-west-2a ; IP : 10.20.0.0/21
+  -> nom : my-private-subnet-1 ; AZ : us-west-2a ; IP : 10.20.8.0/21
+  -> nom : my-public-subnet-2 ; AZ : us-west-2b ; IP : 10.20.16.0/21
+  -> nom : my-private-subnet-2 ; AZ : us-west-2b ; IP : 10.20.24.0/21
+  -> nom : my-public-subnet-3 ; AZ : us-west-2c ; IP : 10.20.32.0/21
+  -> nom : my-private-subnet-3 ; AZ : us-west-2c ; IP : 10.20.40.0/21
+  -> nom : my-public-subnet-4 ; AZ : us-west-2d ; IP : 10.20.48.0/21
+  -> nom : my-private-subnet-4 ; AZ : us-west-2d ; IP : 10.20.56.0/21
+
+# ETAPE 3 : Creation d'un Internet GATEWAY 
+- Pour Les subnets public, ils auront besoin d'un internet GATEWAY pour avoir accès à internet 
+- toujours dans le VPC DASHBOARD, on clique sur internet GATEWAY
+- Ensuite, on voit l'IGW par defaut de sandbox on fait action puis on clique sur detach from VPC 
+- Ensuite, on le selectionne encore puis on fait action attach to a VPC puis on selectionne notre my-vpc
+
+# ETAPE 4 : Creation des tables de routages 
+- Nous allons pour terminer, creer des tables de routage pour la direction des traffique
+- Pour ce faire, toujours dans le VPC DASHBOARD, on clique sur table de routage 
+- on clique sur create table de routage 
+- une fois dedans on l'assigne un nom puis on valide et nous allons repeter ce processus 
+- Apres dans la liste de table de routage, nous allons selectionner chaque table de routage dont le nom a le 
+  nom public et ajouter une route de type 0.0.0.0/0 -> IGW(celui qui est attaché au VPC)
+- apres on va selectionner chaque table de routage et l'associé à un subnet de telle sorte que les privés ont des RTB privé 
+  et les public ont des RTB Public 
+
+
+ETAPE 5 : TEST 
+- Pour le test, il suffit de creer une instance dans chaque subnet et faire des ping vers google.com 
+
+
+Nous concluons ce TP avec succès :) 

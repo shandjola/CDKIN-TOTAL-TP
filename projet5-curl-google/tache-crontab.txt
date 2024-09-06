@@ -1,0 +1,3 @@
+* * * * * /home/ec2-user/fichier.sh;echo "[$(date)] Telechargement du site reussi" >> /home/ec2-user/journal-cron.log
+
+

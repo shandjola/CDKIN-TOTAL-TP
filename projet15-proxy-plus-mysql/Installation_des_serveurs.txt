@@ -1,0 +1,51 @@
+# EXERCICE : Mettre en place une infrastructure des bases de données mySQL (master - master)
+             Utilisier un proxy balancer pour faire des requetes aux bases de données 
+# NOTE : La version de mySQL que nous allons utiliser est le mySQL 5.7.4.4 car il a le plugin d'authentification
+        basique de mysql ne necessitant pas une connexion ssl/tls entre les replicas
+
+# ETAPE 1 : Creation des instances 
+- Sur AWS, on crée trois instance nommé mySQL-server-1, mySQL-server-2 et mon-public 
+- Apres avoir crée les instances on se connecte dessus 
+
+# ETAPE 2 : Installation de mySQL server dans nos instances mySQL-server-1 et 2
+Pour chaque serveur on va executer les commandes suivantes 
+- sudo yum update -y : on met à jour les repository et le l'utilitaire yum 
+- sudo yum remove -y mariadb-libs : on enlève tout ce qui concerne mariadb
+- sudo rpm -Uvh https://dev.mysql.com/get/mysql57-community-release-el7-11.noarch.rpm : On telecharge le fichier de repository pour mySQL 5.7
+- rpm --import https://repo.mysql.com/RPM-GPG-KEY-mysql-2022 : on telecharge les clés pour avoir accès au repository 
+- sudo yum install -y mysql-community-server : On install mysql 
+- sudo systemctl start mysqld : On active le demon de mysql 
+
+# ETAPE 3 : Configuration du serveur mysql 1 et 2  
+On va configurer le master - slave de tel sorte que le serveur 1 est le master et le serveur 2 est le slave
+=> Dans le serveur 1 : master
+- On modifie le fichier my.cnf se trouvant dans /etc, on fait : sudo nano /etc/my.cnf
+- On y insère les lignes suivantes : server-id=1 et log_bin=mysql-bin 
+- On enregistre et on relance le serveur en faisant : sudo systemctl restart mysqld
+- On recupère le mot de passe par defaut crée pour l'utilisateur root en faisant : cat /var/log/mysql.log | grep password
+- On se connecte au serveur mysql en tappant : mysql -u root -p  et on insère le password copié 
+- On cree un utilisateur pour la replication : CREATE USER 'replication_user'@'slave_ip' IDENTIFIED BY 'mot-de-pass'
+- On spécifie l'hote du slave GRANT REPLICATION SLAVE ON *.* TO 'replication_user'@'10.20.0.15';
+- On enregistre le tout avec FLUSH TABLES ;
+- mysqldump -u root -p mot-de-passe --all-databases --master-data > master_dump.sql : on fait la capture de backup pour l'envoyer au slave dans le
+  fichier master_dump.sql
+
+=> Dans le serveur 2 : Slave 
+- On modifie le fichier my.cnf se trouvant dans /etc, on fait : sudo nano /etc/my.cnf
+- On y insère les lignes suivantes : server-id=2 et log_bin=mysql-bin  
+- Une fois qu'on a envoyer le fichier de backup au serveur 2 , on l'insère en faisant mysql < master_dump.sql
+- On crée CHANGE MASTER TO MASTER_HOST='10.20.0.50', MASTER_USER='replication_user', MASTER_PASSWORD='mot-de-pass';
+- On verifie l'etat du slave : avec la commande slave status /G
+
+# ETAPE 4 : Activation et Test
+- Pour tester nous avions crée dans le master la base de données class : create database class 
+- on selectionne la base de données en faisant user class
+- ensuite nous avons creer une table : create table student(nom varchar(20));
+- on y insère un nom en faisant insert into student values ('junior'),('david');
+
+- Ensuite, on se connecte à la base de données slave pour voir que tout est correcte on fait 
+- use class ;
+- puis on tape select * from student ;
+- si on retrouve le nom junior et david ce que tout est bon
+
+C'est par la que la configuration master - slave se finit et c'est un succès :)
